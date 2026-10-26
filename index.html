@@ -1,0 +1,483 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070B12">
+<title>YAXX VPN</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+:root {
+  --bg: #070B12;
+  --panel: #0D1421;
+  --card: #101B2B;
+  --line: rgba(43, 177, 255, .17);
+  --blue: #16C8FF;
+  --blue2: #4387FF;
+  --text: #F4F8FF;
+  --muted: #8293AA;
+  --green: #36E6A2;
+  --radius: 22px;
+}
+* { box-sizing: border-box; }
+html { min-height: 100%; background: var(--bg); }
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  color: var(--text);
+  background:
+    radial-gradient(ellipse at 50% -15%, rgba(0,153,255,.16), transparent 48%),
+    var(--bg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+button { font: inherit; }
+button:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+button:active { transform: scale(.98); }
+.app { min-height: 100vh; min-height: 100dvh; padding-bottom: 100px; }
+.topbar {
+  height: 70px; padding: 0 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 11px; }
+.brand-mark {
+  width: 40px; height: 40px; display: grid; place-items: center;
+  border: 1px solid rgba(22,200,255,.55);
+  border-radius: 14px; color: var(--blue);
+  background: linear-gradient(145deg,#102B43,#0A1422);
+  box-shadow: 0 0 25px rgba(22,200,255,.12);
+}
+.brand-name { font-weight: 850; letter-spacing: 1.4px; font-size: 17px; }
+.brand-sub { font-size: 9px; letter-spacing: 2px; color: var(--muted); margin-top: 3px; }
+.icon-button {
+  width: 42px; height: 42px; border-radius: 14px;
+  border: 1px solid var(--line); background: var(--panel);
+  color: var(--blue); cursor: pointer;
+}
+main { padding: 22px 17px 25px; max-width: 620px; margin: auto; }
+.screen { display: none; animation: screenIn .32s ease both; }
+.screen.active { display: block; }
+@keyframes screenIn {
+  from { opacity: 0; transform: translateY(9px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.eyebrow {
+  font-size: 10px; font-weight: 750; letter-spacing: 2.2px;
+  color: var(--blue); text-transform: uppercase;
+}
+h1 { font-size: clamp(28px,7vw,38px); line-height: 1.12; letter-spacing: -1.1px; margin: 12px 0; }
+h2 { font-size: 21px; margin: 0; letter-spacing: -.4px; }
+p { line-height: 1.55; }
+.muted { color: var(--muted); }
+.hero { padding: 15px 2px 22px; }
+.hero p { font-size: 14px; color: var(--muted); margin: 0; }
+.hero-title span {
+  background: linear-gradient(100deg,#F5FBFF 5%,#16C8FF 55%,#6C9DFF);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.card {
+  background: linear-gradient(145deg,rgba(17,31,49,.98),rgba(10,17,29,.98));
+  border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 20px; margin-bottom: 15px;
+  box-shadow: 0 12px 35px rgba(0,0,0,.12);
+}
+.status-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.status-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  border-radius: 30px; padding: 7px 10px; font-size: 10px;
+  color: var(--muted); background: rgba(130,147,170,.09);
+  border: 1px solid var(--line);
+}
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); }
+.status-icon {
+  width: 54px; height: 54px; display: grid; place-items: center;
+  border-radius: 18px; font-size: 25px; color: var(--blue);
+  background: rgba(22,200,255,.08); border: 1px solid var(--line);
+}
+.status-name { font-size: 22px; font-weight: 800; margin-top: 16px; }
+.status-desc { color: var(--muted); font-size: 13px; margin-top: 7px; }
+.rule { height: 1px; background: var(--line); margin: 18px 0; }
+.info-row { display: flex; justify-content: space-between; gap: 10px; margin: 13px 0; font-size: 13px; }
+.info-row span:first-child { color: var(--muted); }
+.info-row span:last-child { text-align: right; font-weight: 650; }
+.btn {
+  min-height: 51px; width: 100%; border-radius: 16px; padding: 14px 16px;
+  display: flex; justify-content: center; align-items: center; gap: 9px;
+  font-weight: 750; font-size: 14px; cursor: pointer;
+  transition: transform .18s, box-shadow .25s, background .25s;
+}
+.btn-primary {
+  border: 0; color: #04111B;
+  background: linear-gradient(100deg,#16C8FF,#55A8FF);
+  box-shadow: 0 6px 25px rgba(22,200,255,.16);
+}
+.btn-primary:hover { box-shadow: 0 7px 32px rgba(22,200,255,.28); }
+.btn-secondary { background: rgba(22,200,255,.045); color: var(--blue); border: 1px solid rgba(22,200,255,.3); }
+.stack { display: grid; gap: 11px; }
+.section-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 27px 2px 14px; }
+.section-heading h2 { font-size: 19px; }
+.small-link { border: 0; background: none; color: var(--blue); font-size: 12px; cursor: pointer; }
+.feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+.feature {
+  padding: 16px; border-radius: 18px; border: 1px solid var(--line);
+  background: rgba(13,20,33,.85);
+}
+.feature-icon { font-size: 22px; margin-bottom: 14px; }
+.feature strong { font-size: 13px; display: block; }
+.feature p { color: var(--muted); font-size: 11px; margin: 6px 0 0; }
+.plans { display: grid; gap: 13px; }
+.plan {
+  position: relative; overflow: hidden; text-align: left; width: 100%;
+  padding: 19px; border-radius: 21px; cursor: pointer; color: var(--text);
+  border: 1px solid var(--line); background: linear-gradient(145deg,#111C2C,#0B121E);
+  transition: border-color .22s, transform .22s, box-shadow .22s;
+}
+.plan.selected { border-color: var(--blue); box-shadow: 0 0 24px rgba(22,200,255,.1); }
+.plan:after {
+  content: ""; position: absolute; top: -70px; right: -80px;
+  width: 150px; height: 150px; border-radius: 50%;
+  background: rgba(22,200,255,.055); filter: blur(4px); pointer-events: none;
+}
+.plan-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.plan-name { font-size: 17px; font-weight: 800; }
+.plan-days { color: var(--muted); font-size: 12px; margin-top: 5px; }
+.price { font-size: 28px; font-weight: 850; letter-spacing: -.8px; }
+.price small { font-size: 12px; color: var(--muted); font-weight: 500; letter-spacing: 0; }
+.plan-bottom { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+.tag { font-size: 9px; color: #05111C; background: var(--blue); border-radius: 7px; padding: 6px 8px; font-weight: 850; }
+.note { font-size: 11px; color: var(--muted); line-height: 1.5; margin-top: 13px; }
+.page-title { font-size: 30px; margin: 10px 0; letter-spacing: -.8px; }
+.page-intro { color: var(--muted); font-size: 13px; margin: 0 0 22px; }
+.balance-value { font-size: 36px; font-weight: 850; margin: 15px 0; }
+.avatar {
+  width: 72px; height: 72px; display: grid; place-items: center;
+  border-radius: 24px; font-size: 27px; font-weight: 850; color: var(--blue);
+  background: linear-gradient(145deg,#112B44,#0C1524);
+  border: 1px solid rgba(22,200,255,.4); box-shadow: 0 0 30px rgba(22,200,255,.1);
+}
+.profile-top { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; }
+.profile-top h2 { margin-bottom: 5px; }
+.empty { text-align: center; padding: 25px 12px; }
+.empty-icon { font-size: 34px; margin-bottom: 12px; }
+.empty h3 { margin: 0 0 8px; font-size: 16px; }
+.empty p { color: var(--muted); font-size: 12px; }
+.bottom-nav {
+  position: fixed; z-index: 10; bottom: 0; left: 0; right: 0;
+  display: grid; grid-template-columns: repeat(5,1fr);
+  padding: 9px 4px calc(9px + env(safe-area-inset-bottom,0px));
+  background: rgba(9,14,23,.94); border-top: 1px solid var(--line);
+  backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+}
+.nav-item {
+  min-width: 0; border: 0; background: transparent; color: var(--muted);
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
+  gap: 5px; font-size: 9px; cursor: pointer; padding: 5px 0;
+  transition: color .2s, transform .2s;
+}
+.nav-icon { font-size: 20px; line-height: 1.2; }
+.nav-item.active { color: var(--blue); }
+.nav-item.active .nav-icon { filter: drop-shadow(0 0 7px rgba(22,200,255,.55)); transform: translateY(-2px); }
+.splash {
+  position: fixed; z-index: 100; inset: 0; display: flex;
+  align-items: center; justify-content: center; flex-direction: column;
+  padding: 25px; text-align: center; overflow: hidden;
+  background: radial-gradient(ellipse at center, #0D2034 0%, #070B12 58%);
+  transition: opacity .7s ease, visibility .7s ease;
+}
+.splash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+.splash-orb {
+  width: 100px; height: 100px; display: grid; place-items: center;
+  border: 1px solid rgba(22,200,255,.75); border-radius: 30px;
+  color: var(--blue); font-size: 44px;
+  background: rgba(22,200,255,.07);
+  box-shadow: 0 0 35px rgba(22,200,255,.16), inset 0 0 25px rgba(22,200,255,.08);
+  animation: orbIn 1s ease both, pulse 2.6s 1s ease-in-out infinite;
+}
+.splash-kicker { margin-top: 34px; color: var(--blue); font-size: 10px; letter-spacing: 4px; animation: rise .8s .15s both; }
+.splash-title { font-size: clamp(29px,8vw,43px); font-weight: 900; line-height: 1.12; letter-spacing: -1px; margin-top: 16px; animation: rise .9s .3s both; }
+.splash-title span { display: block; margin-top: 7px; color: var(--blue); text-shadow: 0 0 25px rgba(22,200,255,.38); }
+.splash-caption { color: var(--muted); font-size: 13px; margin-top: 18px; animation: rise .9s .5s both; }
+.splash-line { height: 2px; width: 90px; border-radius: 10px; margin-top: 35px; background: linear-gradient(90deg,transparent,var(--blue),transparent); animation: lineIn 1.3s .5s both; }
+@keyframes orbIn { from { opacity:0; transform:scale(.65) rotate(-12deg); } to { opacity:1; transform:scale(1) rotate(0); } }
+@keyframes rise { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+@keyframes pulse { 50% { box-shadow: 0 0 50px rgba(22,200,255,.28), inset 0 0 30px rgba(22,200,255,.12); } }
+@keyframes lineIn { from { width:0; opacity:0; } to { width:90px; opacity:1; } }
+.toast {
+  position: fixed; z-index: 150; bottom: 100px; left: 20px; right: 20px;
+  padding: 14px 16px; border: 1px solid var(--line); border-radius: 15px;
+  background: #111D2C; color: var(--text); font-size: 13px; line-height: 1.45;
+  box-shadow: 0 10px 40px #0008; opacity: 0; transform: translateY(12px);
+  pointer-events: none; transition: .25s;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+</style>
+</head>
+
+<body>
+<div class="splash" id="splash" aria-label="Добро пожаловать в YAXX VPN">
+  <div class="splash-orb">⬡</div>
+  <div class="splash-kicker">SECURE · PRIVATE · FAST</div>
+  <div class="splash-title">ДОБРО ПОЖАЛОВАТЬ<span>В YAXX VPN</span></div>
+  <div class="splash-caption">Твой интернет. Твои правила.</div>
+  <div class="splash-line"></div>
+</div>
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">⬡</div>
+      <div>
+        <div class="brand-name">YAXX VPN</div>
+        <div class="brand-sub">YOUR PRIVATE NETWORK</div>
+      </div>
+    </div>
+    <button class="icon-button" aria-label="Поддержка" onclick="openTab('support')">✳</button>
+  </header>
+
+  <main>
+    <!-- ГЛАВНАЯ -->
+    <section class="screen active" id="screen-home">
+      <div class="hero">
+        <div class="eyebrow">ТВОЁ ПРОСТРАНСТВО</div>
+        <h1 class="hero-title">Добро пожаловать<br><span>в YAXX VPN</span></h1>
+        <p>Управляй подпиской и своими устройствами в одном месте.</p>
+      </div>
+
+      <div class="card">
+        <div class="status-head">
+          <div class="status-icon">◈</div>
+          <div class="status-pill"><span class="dot"></span><span id="status-pill">Проверка статуса</span></div>
+        </div>
+        <div class="status-name" id="home-status">Подписка не проверена</div>
+        <div class="status-desc" id="home-desc">Подключение статуса к серверу ещё не настроено.</div>
+        <div class="rule"></div>
+        <div class="info-row"><span>Тариф</span><span id="home-plan">Не определён</span></div>
+        <div class="info-row"><span>Действует до</span><span id="home-expiry">Нет данных</span></div>
+        <div class="stack" style="margin-top:20px">
+          <button class="btn btn-primary" id="home-sub-btn" onclick="openTab('subscription')">Приобрести подписку <span>↗</span></button>
+          <button class="btn btn-secondary" onclick="openTab('devices')">▦ Мои устройства</button>
+        </div>
+      </div>
+
+      <div class="section-heading"><h2>Твой кабинет</h2></div>
+      <div class="feature-grid">
+        <button class="feature" style="text-align:left;color:inherit;cursor:pointer" onclick="openTab('subscription')">
+          <div class="feature-icon">◈</div><strong>Тарифы</strong>
+          <p>Выбери подходящий срок</p>
+        </button>
+        <button class="feature" style="text-align:left;color:inherit;cursor:pointer" onclick="openTab('balance')">
+          <div class="feature-icon">₽</div><strong>Баланс</strong>
+          <p>Баланс и операции</p>
+        </button>
+      </div>
+    </section>
+
+    <!-- ПОДПИСКА -->
+    <section class="screen" id="screen-subscription">
+      <div class="eyebrow">ТВОЙ ДОСТУП</div>
+      <h1 class="page-title">Подписка</h1>
+      <p class="page-intro">Выбери срок, который подходит тебе.</p>
+
+      <div class="plans">
+        <button class="plan" data-days="30" onclick="selectPlan(30)">
+          <div class="plan-top">
+            <div><div class="plan-name">Старт</div><div class="plan-days">30 дней · 1 устройство</div></div>
+            <div class="price">100 ₽</div>
+          </div>
+          <div class="plan-bottom"><span>Оплата за выбранный срок</span><span>30 дней →</span></div>
+        </button>
+
+        <button class="plan selected" data-days="60" onclick="selectPlan(60)">
+          <div class="plan-top">
+            <div><div class="plan-name">Комфорт</div><div class="plan-days">60 дней · 1 устройство</div></div>
+            <div style="text-align:right"><span class="tag">ПОПУЛЯРНЫЙ</span><div class="price" style="margin-top:9px">190 ₽</div></div>
+          </div>
+          <div class="plan-bottom"><span>Оплата за выбранный срок</span><span>60 дней →</span></div>
+        </button>
+
+        <button class="plan" data-days="90" onclick="selectPlan(90)">
+          <div class="plan-top">
+            <div><div class="plan-name">Максимум</div><div class="plan-days">90 дней · 1 устройство</div></div>
+            <div class="price">270 ₽</div>
+          </div>
+          <div class="plan-bottom"><span>Оплата за выбранный срок</span><span>90 дней →</span></div>
+        </button>
+      </div>
+
+      <div class="card" style="margin-top:17px">
+        <div class="eyebrow">ТВОЙ ВЫБОР</div>
+        <div class="info-row" style="margin-top:17px"><span>Срок</span><span id="chosen-days">60 дней</span></div>
+        <div class="info-row"><span>Стоимость</span><span id="chosen-price" style="color:var(--blue);font-size:17px">190 ₽</span></div>
+        <button class="btn btn-primary" style="margin-top:20px" onclick="requestPurchase()">Продолжить <span>→</span></button>
+        <p class="note">Это демонстрационный интерфейс. Платёжный провайдер и серверное подтверждение оплаты пока не подключены. Покупка здесь не совершается.</p>
+      </div>
+    </section>
+
+    <!-- БАЛАНС -->
+    <section class="screen" id="screen-balance">
+      <div class="eyebrow">ФИНАНСЫ</div>
+      <h1 class="page-title">Баланс</h1>
+      <p class="page-intro">Информация о средствах и операциях.</p>
+      <div class="card">
+        <div class="muted" style="font-size:13px">Текущий баланс</div>
+        <div class="balance-value">— ₽</div>
+        <div class="status-pill">Данные ещё не подключены</div>
+        <div class="rule"></div>
+        <div class="info-row"><span>Последняя операция</span><span>Нет данных</span></div>
+      </div>
+      <div class="card empty">
+        <div class="empty-icon">₽</div>
+        <h3>История операций</h3>
+        <p>Здесь появятся подтверждённые операции после подключения серверного учёта.</p>
+      </div>
+    </section>
+
+    <!-- ПОДДЕРЖКА -->
+    <section class="screen" id="screen-support">
+      <div class="eyebrow">МЫ НА СВЯЗИ</div>
+      <h1 class="page-title">Поддержка</h1>
+      <p class="page-intro">Поможем разобраться с приложением и подключением.</p>
+      <div class="card">
+        <div class="status-icon" style="margin-bottom:17px">✳</div>
+        <h2>Нужна помощь?</h2>
+        <p class="muted" style="font-size:13px">Связь с поддержкой будет доступна после настройки контакта администратора.</p>
+        <button class="btn btn-secondary" onclick="showToast('Контакт поддержки ещё не настроен.')">Связаться с поддержкой</button>
+      </div>
+      <div class="card">
+        <div class="info-row"><span>Статус Mini App</span><span style="color:var(--blue)">Интерфейс готовится</span></div>
+        <div class="info-row"><span>Статус оплаты</span><span>Не подключена</span></div>
+      </div>
+    </section>
+
+    <!-- ПРОФИЛЬ -->
+    <section class="screen" id="screen-profile">
+      <div class="eyebrow">ТВОЙ АККАУНТ</div>
+      <h1 class="page-title">Профиль</h1>
+      <p class="page-intro">Данные Telegram и состояние аккаунта.</p>
+      <div class="card">
+        <div class="profile-top">
+          <div class="avatar" id="avatar">Y</div>
+          <div><h2 id="profile-name">Пользователь</h2><div class="muted" id="profile-username">@telegram</div></div>
+        </div>
+        <div class="rule"></div>
+        <div class="info-row"><span>Telegram ID</span><span id="profile-id">Не доступен</span></div>
+        <div class="info-row"><span>Подписка</span><span id="profile-status">Не проверена</span></div>
+        <p class="note">Пока отображаются только данные, предоставленные Telegram Mini App. Статус подписки должен проверяться на сервере.</p>
+      </div>
+    </section>
+
+    <!-- УСТРОЙСТВА -->
+    <section class="screen" id="screen-devices">
+      <div class="eyebrow">ТВОИ ПОДКЛЮЧЕНИЯ</div>
+      <h1 class="page-title">Устройства</h1>
+      <p class="page-intro">Управление устройствами появится после подключения серверной логики.</p>
+      <div class="card empty">
+        <div class="empty-icon">▦</div>
+        <h3>Список устройств</h3>
+        <p>Реальные устройства пока не загружаются из базы данных. Существующий VPN-профиль не изменён.</p>
+        <button class="btn btn-secondary" onclick="openTab('subscription')">Посмотреть тарифы</button>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Основная навигация">
+    <button class="nav-item active" data-tab="home" onclick="openTab('home',this)"><span class="nav-icon">⌂</span><span>Главная</span></button>
+    <button class="nav-item" data-tab="subscription" onclick="openTab('subscription',this)"><span class="nav-icon">◈</span><span>Подписка</span></button>
+    <button class="nav-item" data-tab="balance" onclick="openTab('balance',this)"><span class="nav-icon">₽</span><span>Баланс</span></button>
+    <button class="nav-item" data-tab="support" onclick="openTab('support',this)"><span class="nav-icon">✳</span><span>Помощь</span></button>
+    <button class="nav-item" data-tab="profile" onclick="openTab('profile',this)"><span class="nav-icon">◎</span><span>Профиль</span></button>
+  </nav>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();
+  try { tg.setHeaderColor('#070B12'); tg.setBackgroundColor('#070B12'); } catch (_) {}
+}
+
+// Демоданные интерфейса. Они не подтверждают реальный статус подписки.
+const DEMO_MODE = true;
+const prices = {30: 100, 60: 190, 90: 270};
+let chosenDays = 60;
+let toastTimer;
+
+function openTab(tab, element) {
+  const target = document.getElementById('screen-' + tab);
+  if (!target) return;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  target.classList.add('active');
+
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.toggle('active', item.dataset.tab === tab);
+  });
+
+  if (element?.dataset?.tab) {
+    element.classList.add('active');
+  }
+  window.scrollTo({top: 0, behavior: 'smooth'});
+  if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+}
+
+function selectPlan(days) {
+  chosenDays = days;
+  document.querySelectorAll('.plan').forEach(card => {
+    card.classList.toggle('selected', Number(card.dataset.days) === days);
+  });
+  document.getElementById('chosen-days').textContent = days + ' дней';
+  document.getElementById('chosen-price').textContent = prices[days] + ' ₽';
+  if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+}
+
+function requestPurchase() {
+  showToast('Оплата ещё не подключена. Ничего не списано, подписка не активирована.');
+}
+
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+}
+
+function initTelegramProfile() {
+  const user = tg?.initDataUnsafe?.user;
+  if (!user) return;
+
+  const name = user.first_name || 'Пользователь';
+  document.getElementById('profile-name').textContent = name;
+  document.getElementById('profile-username').textContent =
+    user.username ? '@' + user.username : 'Имя пользователя не задано';
+  document.getElementById('profile-id').textContent = String(user.id);
+  document.getElementById('avatar').textContent = name.charAt(0).toUpperCase();
+}
+
+function init() {
+  initTelegramProfile();
+
+  // Не показываем выдуманный статус: реальная проверка будет через сервер.
+  document.getElementById('home-status').textContent = 'Статус не проверен';
+  document.getElementById('home-desc').textContent = 'Подключим проверку подписки к серверу.';
+  document.getElementById('status-pill').textContent = 'Ожидает подключения';
+  document.getElementById('home-plan').textContent = 'Нет данных';
+  document.getElementById('home-expiry').textContent = 'Нет данных';
+  document.getElementById('profile-status').textContent = 'Не проверена';
+
+  setTimeout(() => document.getElementById('splash').classList.add('hide'), 2400);
+}
+
+init();
+</script>
+</body>
+</html>
